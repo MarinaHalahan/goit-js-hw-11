@@ -14,29 +14,10 @@ import "simplelightbox/dist/simple-lightbox.min.css";
     
 };
 
-let options = {
-    rootMargin: '200px',
-    threshold: 1.0
-};
 
 
-let target = document.querySelector('.scroll-div');
-let callback = function(entries, observer) {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            searchImages(searchQuery.value)
-                .then(madeMarkup)
-        }
-    })
-};
-let observer = new IntersectionObserver(callback, options);
 
-observer.observe(target);
-
-ref.form.addEventListener("submit", onSubmit);
-
-
-   
+let search = null;
 let lightbox = new SimpleLightbox('.gallery a', { captionsData: "alt", captionDelay:250});
 
 
@@ -70,7 +51,7 @@ const params = {
            const hits = response.data.hits;
       return hits;
       }
-       
+       s
      
 
   } catch (error) {
@@ -83,7 +64,8 @@ const params = {
     page = 1;
      const {
     elements: { searchQuery}
-  } = event.currentTarget;
+      } = event.currentTarget;
+      search = searchQuery.value;
       searchImages(searchQuery.value)
     .then(madeMarkup)
         
@@ -126,3 +108,23 @@ return ref.gallery.insertAdjacentHTML("afterbegin", markup)
 };
 
 
+let options = {
+    rootMargin: '200px',
+    threshold: 1.0
+};
+
+
+let target = document.querySelector('.scroll-div');
+let callback = function(entries, observer) {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            searchImages(search)
+                .then(madeMarkup)
+        }
+    })
+};
+let observer = new IntersectionObserver(callback, options);
+
+observer.observe(target);
+
+ref.form.addEventListener("submit", onSubmit);
