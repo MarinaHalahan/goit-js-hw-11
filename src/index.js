@@ -3,9 +3,35 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import axios from 'axios';
 
 import "simplelightbox/dist/simple-lightbox.min.css";
-import { ref } from "./ref";
 
 
+  const ref = {
+    input: document.querySelector('[name="searchQuery"]'),
+    form: document.querySelector('#search-form'),
+    gallery: document.querySelector('.gallery'),
+      scroll: document.querySelector('.scroll-div'),
+    
+    
+};
+
+let options = {
+    rootMargin: '200px',
+    threshold: 1.0
+};
+ref.scroll.textContent = "nkjkjk";
+
+let target = document.querySelector('.scroll-div');
+let callback = function(entries, observer) {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            searchImages(searchQuery.value)
+                .then(madeMarkup)
+        }
+    })
+};
+let observer = new IntersectionObserver(callback, options);
+
+observer.observe(target);
 
 ref.form.addEventListener("submit", onSubmit);
 
@@ -98,4 +124,5 @@ function madeMarkup(data) {
 return ref.gallery.insertAdjacentHTML("afterbegin", markup)
 
 };
+
 
