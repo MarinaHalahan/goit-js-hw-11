@@ -18,7 +18,7 @@ let options = {
     rootMargin: '200px',
     threshold: 1.0
 };
-ref.scroll.textContent = "nkjkjk";
+
 
 let target = document.querySelector('.scroll-div');
 let callback = function(entries, observer) {
