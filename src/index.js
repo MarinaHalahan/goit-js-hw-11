@@ -1,9 +1,10 @@
 import { ref } from './ref';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import axios from 'axios';
-import  SimpleLightbox  from "simplelightbox";
+import SimpleLightbox from "simplelightbox/dist/simple-lightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
+let lightbox = new SimpleLightbox('.photo-card a', { captionsData: "alt", captionDelay: 250 });
 let search = "";
 axios.defaults.baseURL =  "https://pixabay.com/api/";
 const KEY = "28330490-ea9a8c99c9db698ace415b720";
@@ -11,6 +12,8 @@ let total;
 let page = 1;
 
 ref.form.addEventListener("submit", onSubmit);
+ref.scroll.addEventListener("click", onclick)
+
 
 function onSubmit(event) {
     event.preventDefault();
@@ -18,6 +21,11 @@ function onSubmit(event) {
     search = ref.form.elements.searchQuery.value;
       console.log(search);
     searchImages(search).then(madeMarkup);
+};
+
+function onclick() {
+    page += 1;
+     searchImages(search).then(madeMarkup);
 };
 
 const params = {
@@ -54,6 +62,7 @@ async function searchImages(searchQuery) {
 
 
 function madeMarkup(data) { 
+    lightbox.refresh();
     if (total === 0) {
         return;
     }
@@ -102,8 +111,8 @@ return ref.gallery.insertAdjacentHTML("afterbegin", markup)
 
 // observer.observe(target);
 
-let lightbox = new SimpleLightbox('.photo-card a', { captionsData: "alt", captionDelay: 250 });
-lightbox.refresh();
+
+
 
 
 
