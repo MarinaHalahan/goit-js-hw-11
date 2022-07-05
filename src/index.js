@@ -19,7 +19,7 @@ function onSubmit(event) {
     event.preventDefault();
     page = 1;
     search = ref.form.elements.searchQuery.value;
-    loadMoreBtn.classList.add('is-hidden');
+    ref.scroll.classList.add('is-hidden');
       console.log(search);
     searchImages(search).then(madeMarkup);
 };
