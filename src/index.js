@@ -1,30 +1,24 @@
-import  SimpleLightbox  from 'simplelightbox';
+import { ref } from './ref';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import axios from 'axios';
-
+import  SimpleLightbox  from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
-
-  const ref = {
-    input: document.querySelector('[name="searchQuery"]'),
-    form: document.querySelector('#search-form'),
-    gallery: document.querySelector('.gallery'),
-      scroll: document.querySelector('.scroll-div'),
-    
-    
-};
-
-
-
-
-let search = null;
-let lightbox = new SimpleLightbox('.gallery a', { captionsData: "alt", captionDelay:250});
-
-
+let search = "";
 axios.defaults.baseURL =  "https://pixabay.com/api/";
 const KEY = "28330490-ea9a8c99c9db698ace415b720";
-let page = 1;
 let total;
+let page = 1;
+
+ref.form.addEventListener("submit", onSubmit);
+
+function onSubmit(event) {
+    event.preventDefault();
+    page = 1;
+    search = ref.form.elements.searchQuery.value;
+      console.log(search);
+    searchImages(search).then(madeMarkup);
+};
 
 const params = {
     image_type: "photo",
@@ -32,14 +26,16 @@ const params = {
     safesearch: true,
     per_page:40,
     page,
-   
 };
- async function searchImages(searchQuery) {
+
+async function searchImages(searchQuery) {
+     console.log(searchQuery);
 
   try {
       const response = await axios.get(`/?key=${KEY}&q=${searchQuery}`, { params });
       total = response.data.total;
-      
+      page += 1;
+      console.log(total);
         if (response.data.totalHits === 0) {
             Notify.failure("Sorry, there are no images matching your search query. Please try again.");
             return response;
@@ -48,40 +44,19 @@ const params = {
      
       if (page === 1) {
           Notify.success(`Hooray! We found ${total} images.`);
-           const hits = response.data.hits;
+      };
+      
+      const hits = response.data.hits;
       return hits;
-      }
-       s
-     
-
-  } catch (error) {
+      } catch (error) {
       console.log(error);
   } };
-
-
-  function onSubmit(event) {
-    event.preventDefault();
-    page = 1;
-     const {
-    elements: { searchQuery}
-      } = event.currentTarget;
-      search = searchQuery.value;
-      searchImages(searchQuery.value)
-    .then(madeMarkup)
-        
-    
-     
-
-     
-
-}
 
 
 function madeMarkup(data) { 
     if (total === 0) {
         return;
     }
-    
     const markup = data.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads,}) =>
          `<div class="photo-card"><a href="${largeImageURL}">
                     <img src="${webformatURL}" alt="${tags}" loading="lazy" /></a>
@@ -108,23 +83,30 @@ return ref.gallery.insertAdjacentHTML("afterbegin", markup)
 };
 
 
-let options = {
-    rootMargin: '200px',
-    threshold: 1.0
-};
+// let options = {
+//     rootMargin: '200px',
+//     threshold: 1.0
+// };
 
 
-let target = document.querySelector('.scroll-div');
-let callback = function(entries, observer) {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            searchImages(search)
-                .then(madeMarkup)
-        }
-    })
-};
-let observer = new IntersectionObserver(callback, options);
+// let target = document.querySelector('.scroll-div');
+// let callback = function(entries, observer) {
+//     entries.forEach(entry => {
+//         if (entry.isIntersecting) {
+            
+//         return searchImages(search).then(madeMarkup)
+//         }
+//     })
+// };
+// let observer = new IntersectionObserver(callback, options);
 
-observer.observe(target);
+// observer.observe(target);
 
-ref.form.addEventListener("submit", onSubmit);
+let lightbox = new SimpleLightbox('.photo-card a', { captionsData: "alt", captionDelay: 250 });
+lightbox.refresh();
+
+
+
+ 
+
+
