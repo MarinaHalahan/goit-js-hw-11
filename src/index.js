@@ -1,7 +1,7 @@
 import { ref } from './ref';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import axios from 'axios';
-import SimpleLightbox from "simplelightbox/dist/simple-lightbox";
+import  SimpleLightbox  from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
 let lightbox = new SimpleLightbox('.photo-card a', { captionsData: "alt", captionDelay: 250 });
@@ -19,6 +19,7 @@ function onSubmit(event) {
     event.preventDefault();
     page = 1;
     search = ref.form.elements.searchQuery.value;
+    loadMoreBtn.classList.add('is-hidden');
       console.log(search);
     searchImages(search).then(madeMarkup);
 };
