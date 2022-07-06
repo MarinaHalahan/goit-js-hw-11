@@ -10,25 +10,6 @@ axios.defaults.baseURL =  "https://pixabay.com/api/";
 const KEY = "28330490-ea9a8c99c9db698ace415b720";
 let total;
 let page = 1;
-
-ref.form.addEventListener("submit", onSubmit);
-ref.scroll.addEventListener("click", onclick)
-
-
-function onSubmit(event) {
-    event.preventDefault();
-    page = 1;
-    search = ref.form.elements.searchQuery.value;
-    ref.scroll.classList.add('is-hidden');
-      console.log(search);
-    searchImages(search).then(madeMarkup);
-};
-
-function onclick() {
-    page += 1;
-     searchImages(search).then(madeMarkup);
-};
-
 const params = {
     image_type: "photo",
     orientation: "horizontal",
@@ -37,14 +18,41 @@ const params = {
     page,
 };
 
+ref.form.addEventListener("submit", onSubmit);
+ref.scroll.addEventListener("click", onclick)
+
+
+function onSubmit(event) {
+    event.preventDefault();
+    page = 1;
+    ref.gallery.innerHTML = "";
+    
+    console.log(page);
+    search = ref.form.elements.searchQuery.value;
+    ref.scroll.classList.remove('is-hidden');
+    //   console.log(search);
+    searchImages(search).then(madeMarkup);
+   
+};
+
+ function onclick() {
+    // console.log(params);
+    
+    
+     searchImages(search).then(madeMarkup);
+     console.log(params);
+};
+
+
+
 async function searchImages(searchQuery) {
-     console.log(searchQuery);
+    console.log('pfukeirf');
+    console.log(params);
 
   try {
       const response = await axios.get(`/?key=${KEY}&q=${searchQuery}`, { params });
       total = response.data.total;
-      page += 1;
-      console.log(total);
+    //   console.log(total);
         if (response.data.totalHits === 0) {
             Notify.failure("Sorry, there are no images matching your search query. Please try again.");
             return response;
@@ -54,7 +62,7 @@ async function searchImages(searchQuery) {
       if (page === 1) {
           Notify.success(`Hooray! We found ${total} images.`);
       };
-      
+       page = page+1;
       const hits = response.data.hits;
       return hits;
       } catch (error) {
