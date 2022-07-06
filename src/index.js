@@ -4,6 +4,7 @@ import axios from 'axios';
 import  SimpleLightbox  from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
+
 let lightbox = new SimpleLightbox('.photo-card a', { captionsData: "alt", captionDelay: 250 });
 let search = "";
 axios.defaults.baseURL =  "https://pixabay.com/api/";
@@ -20,42 +21,40 @@ const params = {
 };
 
 ref.form.addEventListener("submit", onSubmit);
-ref.scroll.addEventListener("click", onclick)
+ref.scroll.addEventListener("click", onclick);
 
 
-function onSubmit(event) {
+
+async function onSubmit(event) {
     event.preventDefault();
     page = 1;
     params.page = 1;
     ref.gallery.innerHTML = "";
     
-    console.log(page);
+    
     search = ref.form.elements.searchQuery.value;
     ref.scroll.classList.remove('is-hidden');
-    //   console.log(search);
+  
     ref.form.reset();
-    searchImages(search).then(madeMarkup);
-   
+    await searchImages(search).then(madeMarkup);
+    lightbox.refresh();
+
 };
 
- function onclick() {
-    // console.log(search);
-    
-     lightbox.refresh();
-     searchImages(search).then(madeMarkup);
-     console.log(params);
+  async function onclick() {
+      await searchImages(search).then(madeMarkup);
+      lightbox.refresh();
 };
 
 
 
 async function searchImages(searchQuery) {
-    console.log('pfukeirf');
-    console.log(params);
+    
 
   try {
       const response = await axios.get(`/?key=${KEY}&q=${searchQuery}`, { params });
       total = response.data.total;
-    //   console.log(total);
+    
         if (response.data.totalHits === 0) {
             Notify.failure("Sorry, there are no images matching your search query. Please try again.");
             return response;
@@ -65,8 +64,12 @@ async function searchImages(searchQuery) {
       if (page === 1) {
           Notify.success(`Hooray! We found ${total} images.`);
       };
+      if (page > total / 40) {
+            ref.scroll.classList.add('is-hidden');
+      };
       page = page + 1;
       params.page = page;
+      
         
       const hits = response.data.hits;
       return hits;
@@ -75,12 +78,12 @@ async function searchImages(searchQuery) {
   } };
 
 
-function madeMarkup(data) { 
-    // lightbox.refresh();
+ function madeMarkup(data) { 
+    
     if (total === 0) {
         return;
     }
-    const markup = data.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads,}) =>
+     const markup = data.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads,}) =>
          `<div class="photo-card"><a href="${largeImageURL}">
                     <img src="${webformatURL}" alt="${tags}" loading="lazy" /></a>
                     <div class="info">
@@ -101,29 +104,14 @@ function madeMarkup(data) {
                     `
         
     ).join("");
-return ref.gallery.insertAdjacentHTML("beforeend", markup)
+    return  ref.gallery.insertAdjacentHTML("beforeend", markup);
+    
 
 };
 
 
-// let options = {
-//     rootMargin: '200px',
-//     threshold: 1.0
-// };
 
 
-// let target = document.querySelector('.scroll-div');
-// let callback = function(entries, observer) {
-//     entries.forEach(entry => {
-//         if (entry.isIntersecting) {
-            
-//         return searchImages(search).then(madeMarkup)
-//         }
-//     })
-// };
-// let observer = new IntersectionObserver(callback, options);
-
-// observer.observe(target);
 
 
 
