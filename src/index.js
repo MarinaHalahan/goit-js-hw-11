@@ -16,6 +16,7 @@ const params = {
     safesearch: true,
     per_page:40,
     page,
+    
 };
 
 ref.form.addEventListener("submit", onSubmit);
@@ -25,20 +26,22 @@ ref.scroll.addEventListener("click", onclick)
 function onSubmit(event) {
     event.preventDefault();
     page = 1;
+    params.page = 1;
     ref.gallery.innerHTML = "";
     
     console.log(page);
     search = ref.form.elements.searchQuery.value;
     ref.scroll.classList.remove('is-hidden');
     //   console.log(search);
+    ref.form.reset();
     searchImages(search).then(madeMarkup);
    
 };
 
  function onclick() {
-    // console.log(params);
+    // console.log(search);
     
-    
+     lightbox.refresh();
      searchImages(search).then(madeMarkup);
      console.log(params);
 };
@@ -62,7 +65,9 @@ async function searchImages(searchQuery) {
       if (page === 1) {
           Notify.success(`Hooray! We found ${total} images.`);
       };
-       page = page+1;
+      page = page + 1;
+      params.page = page;
+        
       const hits = response.data.hits;
       return hits;
       } catch (error) {
@@ -71,7 +76,7 @@ async function searchImages(searchQuery) {
 
 
 function madeMarkup(data) { 
-    lightbox.refresh();
+    // lightbox.refresh();
     if (total === 0) {
         return;
     }
@@ -96,7 +101,7 @@ function madeMarkup(data) {
                     `
         
     ).join("");
-return ref.gallery.insertAdjacentHTML("afterbegin", markup)
+return ref.gallery.insertAdjacentHTML("beforeend", markup)
 
 };
 
