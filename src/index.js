@@ -11,40 +11,49 @@ axios.defaults.baseURL =  "https://pixabay.com/api/";
 const KEY = "28330490-ea9a8c99c9db698ace415b720";
 let total;
 let page = 1;
+
 const params = {
     image_type: "photo",
     orientation: "horizontal",
     safesearch: true,
-    per_page:40,
+    per_page: 40,
     page,
-    
 };
 
 ref.form.addEventListener("submit", onSubmit);
-ref.scroll.addEventListener("click", onclick);
+ref.scroll.addEventListener("click", onLoadMoreClick);
 
 
 
 async function onSubmit(event) {
     event.preventDefault();
+    ref.scroll.classList.add('is-hidden');
+
     page = 1;
     params.page = 1;
+
     ref.gallery.innerHTML = "";
-    
-    
     search = ref.form.elements.searchQuery.value;
-    ref.scroll.classList.remove('is-hidden');
-  
     ref.form.reset();
-    await searchImages(search).then(madeMarkup);
+   
+    
+    const asyncSearch = await searchImages(search);
+    madeMarkup(asyncSearch);
+    if(total>0){ref.scroll.classList.remove('is-hidden')}
+;
+  
     lightbox.refresh();
+   
 
 };
 
-  async function onclick() {
-      await searchImages(search).then(madeMarkup);
+  async function onLoadMoreClick() {
+       const asyncSearch = await searchImages(search);
+    madeMarkup(asyncSearch);
       lightbox.refresh();
-};
+      
+    
+  };
 
 
 
@@ -58,21 +67,22 @@ async function searchImages(searchQuery) {
         if (response.data.totalHits === 0) {
             Notify.failure("Sorry, there are no images matching your search query. Please try again.");
             return response;
-      };
+        };
       
-     
-      if (page === 1) {
+        if (page === 1) {
           Notify.success(`Hooray! We found ${total} images.`);
       };
-      if (page > total / 40) {
-            ref.scroll.classList.add('is-hidden');
-      };
+     
+      if (page >= Math.ceil(total / 40)) {
+          ref.scroll.classList.add('is-hidden');
+            
+        };
       page = page + 1;
       params.page = page;
-      
-        
       const hits = response.data.hits;
+
       return hits;
+
       } catch (error) {
       console.log(error);
   } };
@@ -85,19 +95,19 @@ async function searchImages(searchQuery) {
     }
      const markup = data.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads,}) =>
          `<div class="photo-card"><a href="${largeImageURL}">
-                    <img src="${webformatURL}" alt="${tags}" loading="lazy" /></a>
+                    <img class = "gallery_img" src="${webformatURL}" alt="${tags}" loading="lazy" /></a>
                     <div class="info">
                         <p class="info-item">
-                        <b>Likes</b>${likes}
+                        <b>Likes</b> ${likes}
                         </p>
                         <p class="info-item">
-                        <b>Views</b>${views}
+                        <b>Views</b> ${views}
                         </p>
                         <p class="info-item">
-                        <b>Comments</b>${comments}
+                        <b>Comments</b> ${comments}
                         </p>
                         <p class="info-item">
-                        <b>Downloads</b>${downloads}
+                        <b>Downloads</b> ${downloads}
                         </p>
                     </div>
                     </div>
