@@ -1,91 +1,45 @@
 import { ref } from './ref';
+import { total, params, searchImages } from "./fetch";
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import axios from 'axios';
 import  SimpleLightbox  from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
 
 let lightbox = new SimpleLightbox('.photo-card a', { captionsData: "alt", captionDelay: 250 });
 let search = "";
-axios.defaults.baseURL =  "https://pixabay.com/api/";
-const KEY = "28330490-ea9a8c99c9db698ace415b720";
-let total;
-let page = 1;
-
-const params = {
-    image_type: "photo",
-    orientation: "horizontal",
-    safesearch: true,
-    per_page: 40,
-    page,
-};
 
 ref.form.addEventListener("submit", onSubmit);
 ref.scroll.addEventListener("click", onLoadMoreClick);
-
-
 
 async function onSubmit(event) {
     event.preventDefault();
     ref.scroll.classList.add('is-hidden');
 
-    page = 1;
+  
     params.page = 1;
+
 
     ref.gallery.innerHTML = "";
     search = ref.form.elements.searchQuery.value;
+    if (search === "") {
+         Notify.failure("Sorry, there are no images matching your search query. Please try again.");
+        return;
+    }
     ref.form.reset();
    
     
     const asyncSearch = await searchImages(search);
     madeMarkup(asyncSearch);
-    if(total>0){ref.scroll.classList.remove('is-hidden')}
-;
+    if(total>0){ref.scroll.classList.remove('is-hidden')};
   
     lightbox.refresh();
-   
-
 };
 
   async function onLoadMoreClick() {
        const asyncSearch = await searchImages(search);
     madeMarkup(asyncSearch);
-      lightbox.refresh();
-      
-    
-  };
-
-
-
-async function searchImages(searchQuery) {
-    
-
-  try {
-      const response = await axios.get(`/?key=${KEY}&q=${searchQuery}`, { params });
-      total = response.data.total;
-    
-        if (response.data.totalHits === 0) {
-            Notify.failure("Sorry, there are no images matching your search query. Please try again.");
-            return response;
-        };
-      
-        if (page === 1) {
-          Notify.success(`Hooray! We found ${total} images.`);
-      };
-     
-      if (page >= Math.ceil(total / 40)) {
-          ref.scroll.classList.add('is-hidden');
-            
-        };
-      page = page + 1;
-      params.page = page;
-      const hits = response.data.hits;
-
-      return hits;
-
-      } catch (error) {
-      console.log(error);
-  } };
+    lightbox.refresh();
+};
 
 
  function madeMarkup(data) { 
@@ -115,8 +69,6 @@ async function searchImages(searchQuery) {
         
     ).join("");
     return  ref.gallery.insertAdjacentHTML("beforeend", markup);
-    
-
 };
 
 
