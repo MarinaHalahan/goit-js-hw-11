@@ -20,7 +20,7 @@ async function onSubmit(event) {
 
 
     ref.gallery.innerHTML = "";
-    search = ref.form.elements.searchQuery.value;
+    search = ref.form.elements.searchQuery.value.trim();
     if (search === "") {
          Notify.failure("Sorry, there are no images matching your search query. Please try again.");
         return;
